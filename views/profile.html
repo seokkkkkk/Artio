@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>프로필 페이지</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                background-color: #f4f8fd;
+            }
+            .profile-container {
+                width: 300px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background-color: #ffffff;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            h2 {
+                color: #1d4ed8;
+                text-align: center;
+            }
+            .profile-info {
+                margin-bottom: 20px;
+            }
+            .profile-info p {
+                margin: 5px 0;
+            }
+            .logout-button {
+                width: 100%;
+                padding: 10px;
+                background-color: #1d4ed8;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .logout-button:hover {
+                background-color: #155ab6;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="profile-container">
+            <h2>프로필 정보</h2>
+            <div class="profile-info">
+                <p>
+                    <strong>고유ID:</strong> <span id="userId">Loading...</span>
+                </p>
+                <p>
+                    <strong>사용자명:</strong>
+                    <span id="username">Loading...</span>
+                </p>
+                <p>
+                    <strong>가입 날짜:</strong>
+                    <span id="createdAt">Loading...</span>
+                </p>
+            </div>
+            <button class="logout-button" onclick="logout()">로그아웃</button>
+        </div>
+
+        <script>
+            // 프로필 정보를 서버에서 가져와서 표시
+            async function loadProfile() {
+                try {
+                    const response = await fetch("api/user/profile", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    const data = await response.json();
+                    if (data.error) {
+                        alert(data.error);
+                        window.location.href = "/login.html";
+                        return;
+                    }
+
+                    // 프로필 정보 업데이트
+                    document.getElementById("userId").textContent = data.id;
+                    document.getElementById("username").textContent =
+                        data.username;
+                    document.getElementById("createdAt").textContent = new Date(
+                        data.createdAt
+                    ).toLocaleDateString();
+                } catch (error) {
+                    console.error("Failed to load profile:", error);
+                    alert("프로필 정보를 불러오지 못했습니다.");
+                    window.location.href = "/login.html";
+                }
+            }
+
+            // 로그아웃 함수
+            async function logout() {
+                const response = await fetch("api/logout", {
+                    method: "POST",
+                });
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = "/login.html";
+            }
+
+            // 페이지 로드 시 프로필 정보 불러오기
+            loadProfile();
+        </script>
+    </body>
+</html>
