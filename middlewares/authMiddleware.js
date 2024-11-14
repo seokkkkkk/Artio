@@ -6,3 +6,11 @@ const authMiddleware = (req, res, next) => {
 };
 
 module.exports = authMiddleware;
+
+exports.isAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        // 로그인된 상태라면 profile.html로 리다이렉트
+        return res.redirect("/profile");
+    }
+    next();
+};
