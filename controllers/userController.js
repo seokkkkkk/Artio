@@ -50,7 +50,8 @@ exports.getUsers = async (req, res) => {
         const users = await User.find({}, { password: 0 });
         res.json(users);
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        console.error("유저 리스트를 가져오는 중 오류 발생:", error);
+        res.status(500).json({ message: "서버 오류가 발생했습니다." });
     }
 };
 
@@ -68,7 +69,7 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
     const { id } = req.params;
-    const { username, password } = req.body;
+    const { username } = req.body;
 
     try {
         const user = await User.findById(id);
@@ -76,24 +77,44 @@ exports.updateUserProfile = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        user.username = username || user.username;
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
+        if (user.deletedAt) {
+            return res
+                .status(400)
+                .json({ message: "User account is deactivated" });
         }
+
+        // 사용자명 업데이트
+        user.username = username || user.username;
         await user.save();
 
         res.json({ message: "Profile updated successfully" });
     } catch (error) {
+        console.error("Error updating profile:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
 
 exports.deleteUser = async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.session.user.id);
+        const user = await User.findById(req.session.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.deletedAt) {
+            return res
+                .status(400)
+                .json({ message: "User account is already deactivated" });
+        }
+
+        // Soft delete: deletedAt 필드에 현재 시간 저장
+        user.deletedAt = new Date();
+        await user.save();
+
         req.session.destroy();
-        res.json({ message: "User deleted successfully" });
+        res.json({ message: "User account deactivated successfully" });
     } catch (error) {
+        console.error("Error deactivating account:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

@@ -26,7 +26,18 @@ app.use(express.static("views")); // 정적 파일 제공
 
 // 기본 라우트 설정
 app.get("/", (req, res) => {
+    if (req.session.user) {
+        return res.redirect("/profile");
+    }
     res.sendFile(__dirname + "/views/login.html");
+});
+
+// 프로필 페이지
+app.get("/profile", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+    res.sendFile(__dirname + "/views/profile.html");
 });
 
 // API 라우트 연결
