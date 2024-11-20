@@ -11,4 +11,6 @@ router.get("/user/profile", authMiddleware, userController.getProfile);
 router.put("/user/:id", authMiddleware, userController.updateUserProfile);
 router.delete("/withdraw", authMiddleware, userController.deleteUser);
 
+router.post("/follow", userController.followUser);
+
 module.exports = router;

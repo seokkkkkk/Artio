@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Feed</title>
+    </head>
+    <body>
+        <h1>Feed</h1>
+        <ul id="postList"></ul>
+        <script>
+            async function loadFeed() {
+                const response = await fetch("/posts/feed");
+                const posts = await response.json();
+
+                const postList = document.getElementById("postList");
+                posts.forEach((post) => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                    <h3>${post.user.username}</h3>
+                    <p>${post.content}</p>
+                    ${
+                        post.imageUrl
+                            ? `<img src="${post.imageUrl}" alt="Post Image" />`
+                            : ""
+                    }
+                `;
+                    postList.appendChild(li);
+                });
+            }
+
+            loadFeed();
+        </script>
+    </body>
+</html>

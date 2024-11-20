@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>프로필 페이지</title>
+        <title>프로필</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -11,10 +11,12 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                height: 100vh;
+                min-height: 100vh;
                 background-color: #f4f8fd;
+                margin: 0;
+                padding: 20px;
             }
-            .profile-container {
+            .container {
                 width: 300px;
                 padding: 20px;
                 border: 1px solid #ddd;
@@ -23,8 +25,9 @@
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }
             h2 {
-                color: #1d4ed8;
                 text-align: center;
+                color: #1d4ed8;
+                margin-bottom: 20px;
             }
             .profile-info {
                 margin-bottom: 20px;
@@ -32,48 +35,52 @@
             .profile-info p {
                 margin: 5px 0;
             }
-            .button-group {
+            .form {
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                margin-bottom: 20px;
             }
-            .button {
-                width: 100%;
+            textarea,
+            input[type="file"] {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                resize: none;
+            }
+            button {
                 padding: 10px;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
-                color: #fff;
                 font-weight: bold;
-            }
-            .logout-button {
+                color: #fff;
                 background-color: #1d4ed8;
             }
-            .logout-button:hover {
+            button:hover {
                 background-color: #155ab6;
             }
-            .edit-button {
-                background-color: #fef08a;
-                color: #1d4ed8;
+            .post-list {
+                margin-top: 20px;
             }
-            .edit-button:hover {
-                background-color: #fde047;
+            .post-item {
+                margin-bottom: 15px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: #f9fafb;
             }
-            .delete-button {
-                background-color: #e11d48;
-            }
-            .delete-button:hover {
-                background-color: #be123c;
+            .post-item img {
+                max-width: 100%;
+                border-radius: 5px;
+                margin-top: 5px;
             }
         </style>
     </head>
     <body>
-        <div class="profile-container">
-            <h2>프로필 정보</h2>
+        <div class="container">
+            <h2>프로필 및 게시물 관리</h2>
             <div class="profile-info">
-                <p>
-                    <strong>고유ID:</strong> <span id="userId">Loading...</span>
-                </p>
                 <p>
                     <strong>사용자명:</strong>
                     <span id="username">Loading...</span>
@@ -83,114 +90,97 @@
                     <span id="createdAt">Loading...</span>
                 </p>
             </div>
-            <div class="button-group">
-                <button class="button logout-button" onclick="logout()">
-                    로그아웃
-                </button>
-                <button class="button edit-button" onclick="editProfile()">
-                    프로필 수정
-                </button>
-                <button class="button delete-button" onclick="deleteUser()">
-                    회원 탈퇴
-                </button>
+
+            <form
+                class="form"
+                id="postForm"
+                action="/posts/upload"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+                <textarea
+                    name="content"
+                    id="postContent"
+                    rows="4"
+                    placeholder="Write something..."
+                    required
+                ></textarea>
+                <input type="file" name="image" accept="image/*" />
+                <button type="submit">Post</button>
+            </form>
+
+            <div class="post-list" id="postList">
+                <h3>내 게시물</h3>
             </div>
         </div>
 
         <script>
-            // 프로필 정보를 서버에서 가져와서 표시
-            async function loadProfile() {
+            async function loadProfileAndPosts() {
                 try {
-                    const response = await fetch("api/user/profile", {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
+                    // 사용자 정보 가져오기
+                    const profileResponse = await fetch("/api/user/profile");
+                    const profileData = await profileResponse.json();
 
-                    const data = await response.json();
-                    if (data.error) {
-                        alert(data.error);
+                    if (profileData.error) {
+                        alert(profileData.error);
                         window.location.href = "/login.html";
                         return;
                     }
 
                     // 프로필 정보 업데이트
-                    document.getElementById("userId").textContent = data.id;
                     document.getElementById("username").textContent =
-                        data.username;
+                        profileData.username;
                     document.getElementById("createdAt").textContent = new Date(
-                        data.createdAt
+                        profileData.createdAt
                     ).toLocaleDateString();
+
+                    // 게시물 가져오기
+                    const postResponse = await fetch("/posts/my");
+                    const postData = await postResponse.json();
+
+                    const postList = document.getElementById("postList");
+                    postList.innerHTML = "";
+
+                    postData.forEach((post) => {
+                        const postItem = document.createElement("div");
+                        postItem.className = "post-item";
+                        postItem.innerHTML = `
+                            <p>${post.content}</p>
+                            ${
+                                post.imageUrl
+                                    ? `<img src="${post.imageUrl}" alt="Post Image" />`
+                                    : ""
+                            }
+                        `;
+                        postList.appendChild(postItem);
+                    });
                 } catch (error) {
-                    console.error("Failed to load profile:", error);
-                    alert("프로필 정보를 불러오지 못했습니다.");
-                    window.location.href = "/login.html";
+                    console.error("Failed to load profile and posts:", error);
+                    alert("정보를 불러오지 못했습니다.");
                 }
             }
 
-            // 로그아웃 함수
-            async function logout() {
-                const response = await fetch("api/logout", {
+            // 페이지 로드 시 프로필 및 게시물 정보 가져오기
+            loadProfileAndPosts();
+
+            // 게시물 작성 후 새로고침 방지 및 게시물 목록 갱신
+            document.getElementById("postForm").onsubmit = async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const response = await fetch("/posts/upload", {
                     method: "POST",
+                    body: formData,
                 });
-                const data = await response.json();
-                alert(data.message);
-                window.location.href = "/login.html";
-            }
 
-            // 프로필 수정 함수
-            async function editProfile() {
-                const newUsername = prompt("새로운 사용자명을 입력하세요:");
-                if (!newUsername) return;
-
-                try {
-                    const userId =
-                        document.getElementById("userId").textContent;
-                    const response = await fetch(`api/user/${userId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ username: newUsername }),
-                    });
-
-                    const data = await response.json();
-                    alert(data.message);
-
-                    if (data.message === "Profile updated successfully") {
-                        loadProfile(); // 프로필 정보 갱신
-                    }
-                } catch (error) {
-                    console.error("Failed to update profile:", error);
-                    alert("프로필 수정 중 오류가 발생했습니다.");
+                if (response.ok) {
+                    alert("게시물이 성공적으로 업로드되었습니다.");
+                    this.reset();
+                    loadProfileAndPosts(); // 게시물 목록 갱신
+                } else {
+                    alert("게시물 업로드 중 오류가 발생했습니다.");
                 }
-            }
-
-            // 회원 탈퇴 함수
-            async function deleteUser() {
-                if (
-                    !confirm(
-                        "정말로 회원 탈퇴를 진행하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-                    )
-                )
-                    return;
-
-                try {
-                    const response = await fetch("api/withdraw", {
-                        method: "DELETE",
-                    });
-
-                    const data = await response.json();
-                    alert(data.message);
-                    window.location.href = "/login.html";
-                } catch (error) {
-                    console.error("Failed to deactivate account:", error);
-                    alert("회원 탈퇴 중 오류가 발생했습니다.");
-                }
-            }
-
-            // 페이지 로드 시 프로필 정보 불러오기
-            loadProfile();
+            };
         </script>
     </body>
 </html>

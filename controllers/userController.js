@@ -142,3 +142,33 @@ exports.getProfile = async (req, res) => {
         res.status(500).json({ error: "서버 오류가 발생했습니다." });
     }
 };
+
+exports.followUser = async (req, res) => {
+    const { userId } = req.body;
+    const currentUserId = req.session.user.id;
+
+    try {
+        const currentUser = await User.findById(currentUserId);
+        const targetUser = await User.findById(userId);
+
+        if (!targetUser)
+            return res.status(404).json({ message: "User not found" });
+
+        if (currentUser.following.includes(userId)) {
+            return res
+                .status(400)
+                .json({ message: "Already following this user" });
+        }
+
+        currentUser.following.push(userId);
+        targetUser.followers.push(currentUserId);
+
+        await currentUser.save();
+        await targetUser.save();
+
+        res.json({ message: "Followed successfully" });
+    } catch (error) {
+        console.error("Error following user:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
