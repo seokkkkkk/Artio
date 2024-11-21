@@ -1,5 +1,5 @@
 <div id="footer">
-    <a href="/">
+    <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -18,7 +18,7 @@
             />
         </svg>
     </a>
-    <a href="/">
+    <a href="/post" class="<%= currentPath === '/create' ? 'active' : '' %>">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -38,7 +38,10 @@
             <line x1="8" x2="16" y1="12" y2="12" />
         </svg>
     </a>
-    <a href="/">
+    <a
+        href="/following"
+        class="<%= currentPath === '/favorites' ? 'active' : '' %>"
+    >
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"

@@ -8,6 +8,14 @@ router
     .get(artworkController.getAllArtworks)
     .post(authMiddleware.protect, artworkController.createArtwork);
 
+router.route("/latest").get(artworkController.getAllArtworksLatest); // 최신 순 작품 조회
+
+router.route("/likes").get(artworkController.getAllArtworksByLikes); // 좋아요 순 작품 조회
+
+router.route("/views").get(artworkController.getAllArtworksByViews); // 조회수 순 작품 조회
+
+router.route("/last-month").get(artworkController.getArtworksFromLastMonth); // 한 달 이내 작품 조회
+
 router
     .route("/:id")
     .get(artworkController.getArtworkById)

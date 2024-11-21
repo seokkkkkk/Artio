@@ -24,7 +24,21 @@ exports.getArtworkById = async (req, res) => {
             return res
                 .status(404)
                 .json({ status: "fail", message: "작품을 찾을 수 없습니다." });
+
+        // 조회수 증가
+        await artwork.incrementViews();
+
         res.status(200).json({ status: "success", data: artwork });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+// 사용자 작품 조회
+exports.getUserArtworks = async (req, res) => {
+    try {
+        const artworks = await Artwork.find({ createdBy: req.params.userId });
+        res.status(200).json({ status: "success", data: artworks });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
     }
@@ -167,5 +181,59 @@ exports.toggleLike = async (req, res) => {
         res.status(500).json({ status: "fail", message: error.message });
     } finally {
         session.endSession();
+    }
+};
+
+// 최신 순으로 작품 조회
+exports.getAllArtworksLatest = async (req, res) => {
+    try {
+        const artworks = await Artwork.find()
+            .sort({ createdAt: -1 }) // 최신순 정렬
+            .populate("createdBy", "username profileImage");
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+// 좋아요 순으로 작품 조회
+exports.getAllArtworksByLikes = async (req, res) => {
+    try {
+        const artworks = await Artwork.find()
+            .sort({ likes: -1 }) // 좋아요 개수 기준 내림차순
+            .populate("createdBy", "username profileImage");
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+// 한 달 이내 사용자들의 작품 조회
+exports.getArtworksFromLastMonth = async (req, res) => {
+    try {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        const artworks = await Artwork.find({
+            createdAt: { $gte: oneMonthAgo }, // 한 달 이내 데이터
+        })
+            .populate("createdBy", "username profileImage")
+            .sort({ createdAt: -1 }); // 최신순 정렬
+
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+// 조회수 순으로 작품 조회
+exports.getAllArtworksByViews = async (req, res) => {
+    try {
+        const artworks = await Artwork.find()
+            .sort({ views: -1 }) // 조회수 기준 내림차순 정렬
+            .populate("createdBy", "username profileImage");
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
     }
 };

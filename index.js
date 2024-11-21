@@ -18,6 +18,11 @@ app.set("views", path.join(__dirname, "views"));
 // 정적 파일 제공 (CSS 등)
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use((req, res, next) => {
+    res.locals.currentPath = req.path; // 현재 요청 경로를 `currentPath`로 설정
+    next();
+});
+
 app.get("/login", (req, res) => {
     res.render("pages/login");
 });
@@ -39,6 +44,14 @@ app.get("/", (req, res) => {
 
 app.get("/profile", (req, res) => {
     res.render("pages/profile");
+});
+
+app.get("/follow", (req, res) => {
+    res.render("pages/follow");
+});
+
+app.get("/post", (req, res) => {
+    res.render("pages/post");
 });
 
 // MongoDB 연결 설정
