@@ -50,8 +50,12 @@ app.get("/follow", (req, res) => {
     res.render("pages/follow");
 });
 
-app.get("/post", (req, res) => {
-    res.render("pages/post");
+app.get("/post/new", (req, res) => {
+    res.render("pages/newPost");
+});
+
+app.get("/post/:id", (req, res) => {
+    res.render("pages/postDetail");
 });
 
 // MongoDB 연결 설정

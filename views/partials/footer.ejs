@@ -18,7 +18,10 @@
             />
         </svg>
     </a>
-    <a href="/post" class="<%= currentPath === '/create' ? 'active' : '' %>">
+    <a
+        href="/post/new"
+        class="<%= currentPath === '/post/new' ? 'active' : '' %>"
+    >
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
@@ -38,10 +41,7 @@
             <line x1="8" x2="16" y1="12" y2="12" />
         </svg>
     </a>
-    <a
-        href="/following"
-        class="<%= currentPath === '/favorites' ? 'active' : '' %>"
-    >
+    <a href="/follow" class="<%= currentPath === '/follow' ? 'active' : '' %>">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="32"
