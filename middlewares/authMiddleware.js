@@ -1,16 +1,48 @@
-const authMiddleware = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: "로그인이 필요합니다." });
-    }
-    next();
-};
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-module.exports = authMiddleware;
+exports.protect = async (req, res, next) => {
+    try {
+        let token;
+        if (req.cookies && req.cookies.jwt) {
+            token = req.cookies.jwt;
+        } else if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith("Bearer")
+        ) {
+            token = req.headers.authorization.split(" ")[1];
+        }
 
-exports.isAuthenticated = (req, res, next) => {
-    if (req.session.user) {
-        // 로그인된 상태라면 profile.html로 리다이렉트
-        return res.redirect("/profile");
+        if (!token) {
+            return res.status(401).json({
+                status: "fail",
+                message: "인증되지 않은 사용자입니다.",
+            });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (error) {
+            return res.status(401).json({
+                status: "fail",
+                message:
+                    error.name === "TokenExpiredError"
+                        ? "토큰이 만료되었습니다."
+                        : "유효하지 않은 토큰입니다.",
+            });
+        }
+
+        req.user = await User.findById(decoded.id);
+        if (!req.user) {
+            return res.status(401).json({
+                status: "fail",
+                message: "유효하지 않은 사용자입니다.",
+            });
+        }
+
+        next();
+    } catch (error) {
+        res.status(401).json({ status: "fail", message: "인증 오류" });
     }
-    next();
 };
