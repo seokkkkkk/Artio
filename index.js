@@ -5,9 +5,41 @@ const cookieParser = require("cookie-parser");
 const dbConnect = require("./config/dbConnect");
 const helmet = require("helmet");
 const cors = require("cors");
+const path = require("path");
+const ejsLayouts = require("express-ejs-layouts");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// EJS 설정
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// 정적 파일 제공 (CSS 등)
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/login", (req, res) => {
+    res.render("pages/login");
+});
+
+app.get("/signup", (req, res) => {
+    res.render("pages/register");
+});
+
+// express-ejs-layouts 미들웨어 추가
+app.use(ejsLayouts);
+app.set("layout", "layout"); // 기본 레이아웃 파일 설정 (layout.ejs)
+
+// 라우트 설정
+app.get("/", (req, res) => {
+    res.render("pages/home", {
+        cssFile: "home",
+    });
+});
+
+app.get("/profile", (req, res) => {
+    res.render("pages/profile");
+});
 
 // MongoDB 연결 설정
 dbConnect();
@@ -38,6 +70,21 @@ app.use((err, req, res, next) => {
         status: "fail",
         message: "서버 오류가 발생했습니다.",
     });
+});
+
+app.get("/artworks/:id", async (req, res) => {
+    try {
+        const artwork = await Artwork.findById(req.params.id)
+            .populate("createdBy", "username profileImage")
+            .populate("comments.user", "username profileImage");
+        if (!artwork) {
+            return res.status(404).send("작품을 찾을 수 없습니다.");
+        }
+        res.render("artworkDetail", { artwork });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("서버 오류가 발생했습니다.");
+    }
 });
 
 // 서버 시작

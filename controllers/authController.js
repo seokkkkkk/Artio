@@ -21,7 +21,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 // 회원가입
 exports.signup = async (req, res) => {
     try {
-        const { username, id, password, bio } = req.body;
+        const { username, id, password } = req.body;
         if (!username || !id || !password) {
             return res.status(400).json({
                 status: "fail",
@@ -34,7 +34,7 @@ exports.signup = async (req, res) => {
             username,
             id,
             password: hashedPassword,
-            bio,
+            bio: "",
         });
 
         sendTokenResponse(newUser, 201, res);

@@ -1,3 +1,8 @@
+const express = require("express");
+const artworkController = require("../controllers/artworkController");
+const authMiddleware = require("../middlewares/authMiddleware");
+const router = express.Router();
+
 router
     .route("/")
     .get(artworkController.getAllArtworks)
