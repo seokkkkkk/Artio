@@ -82,6 +82,7 @@ a {
 }
 
 #header {
+    z-index: 10;
     max-width: 480px;
     min-width: 320px;
     top: 0;
@@ -109,6 +110,7 @@ a {
 }
 
 #footer {
+    z-index: 10;
     max-width: 480px;
     min-width: 320px;
     width: 100%;

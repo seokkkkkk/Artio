@@ -188,7 +188,7 @@ exports.toggleLike = async (req, res) => {
 exports.getAllArtworksLatest = async (req, res) => {
     try {
         const artworks = await Artwork.find()
-            .sort({ createdAt: -1 }) // 최신순 정렬
+            .sort({ uploadedAt: -1 }) // 최신순 정렬
             .populate("createdBy", "username profileImage");
         res.status(200).json({ status: "success", data: artworks });
     } catch (error) {

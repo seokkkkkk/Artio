@@ -43,19 +43,27 @@ app.get("/", (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-    res.render("pages/profile");
+    res.render("pages/profile", {
+        cssFile: "profile",
+    });
 });
 
 app.get("/follow", (req, res) => {
-    res.render("pages/follow");
+    res.render("pages/follow", {
+        cssFile: "follow",
+    });
 });
 
 app.get("/post/new", (req, res) => {
-    res.render("pages/newPost");
+    res.render("pages/newPost", {
+        cssFile: "newPost",
+    });
 });
 
 app.get("/post/:id", (req, res) => {
-    res.render("pages/postDetail");
+    res.render("pages/postDetail", {
+        cssFile: "postDetail",
+    });
 });
 
 // MongoDB 연결 설정

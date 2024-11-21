@@ -12,14 +12,20 @@ const artworkSchema = new mongoose.Schema(
             trim: true,
             maxlength: [1000, "작품 설명은 최대 1000자까지 가능합니다."],
         },
-        imageUrl: {
-            type: String,
-            required: [true, "작품 이미지는 필수 항목입니다."],
-        },
+        imageUrls: [
+            {
+                type: String,
+                required: [true, "작품 이미지는 필수 항목입니다."],
+            },
+        ],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
+        },
+        uploadedAt: {
+            type: Date,
+            default: Date.now,
         },
         price: {
             type: Number,
