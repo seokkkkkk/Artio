@@ -140,16 +140,16 @@ exports.deleteComment = async (req, res) => {
 
 // 좋아요 추가/취소
 exports.toggleLike = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const artwork = await Artwork.findById(req.params.id);
-        if (!artwork)
-            return res.status(404).json({
-                status: "fail",
-                message: "작품을 찾을 수 없습니다.",
-            });
+        const artwork = await Artwork.findById(req.params.id).session(session);
+        if (!artwork) {
+            throw new Error("작품을 찾을 수 없습니다.");
+        }
 
         const likeIndex = artwork.likes.indexOf(req.user.id);
-
         if (likeIndex === -1) {
             // 좋아요 추가
             artwork.likes.push(req.user.id);
@@ -158,10 +158,14 @@ exports.toggleLike = async (req, res) => {
             artwork.likes.splice(likeIndex, 1);
         }
 
-        await artwork.save();
+        await artwork.save({ session });
+        await session.commitTransaction();
 
         res.status(200).json({ status: "success", data: artwork });
     } catch (error) {
+        await session.abortTransaction();
         res.status(500).json({ status: "fail", message: error.message });
+    } finally {
+        session.endSession();
     }
 };
