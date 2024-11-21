@@ -21,29 +21,39 @@ const sendTokenResponse = (user, statusCode, res) => {
 // 회원가입
 exports.signup = async (req, res) => {
     try {
-        const { username, id, password, bio } = req.body;
-        if (!username || !id || !password || !bio) {
+        const { username, id, password, confirmPassword, bio } = req.body;
+
+        // 비밀번호 확인
+        if (password !== confirmPassword) {
             return res.status(400).json({
                 status: "fail",
-                message: "필수 항목을 모두 입력하세요.",
+                message: "비밀번호가 일치하지 않습니다.",
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        // ID 중복 확인
+        const existingUser = await User.findOne({ id });
+        if (existingUser) {
+            return res.status(400).json({
+                status: "fail",
+                message: "이미 사용 중인 아이디입니다.",
+            });
+        }
+
+        // 사용자 생성
         const newUser = await User.create({
             username,
             id,
-            password: hashedPassword,
-            bio: "",
+            password,
+            bio,
         });
 
         sendTokenResponse(newUser, 201, res);
     } catch (error) {
-        let message = error.message;
-        if (error.code === 11000) {
-            message = "이미 사용 중인 아이디입니다.";
-        }
-        res.status(400).json({ status: "fail", message });
+        res.status(500).json({
+            status: "fail",
+            message: error.message,
+        });
     }
 };
 
@@ -59,6 +69,7 @@ exports.login = async (req, res) => {
         }
 
         const user = await User.findOne({ id }).select("+password");
+
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({
                 status: "fail",

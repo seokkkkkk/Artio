@@ -7,9 +7,19 @@ const helmet = require("helmet");
 const cors = require("cors");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
+const authMiddleware = require("./middlewares/authMiddleware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// MongoDB 연결 설정
+dbConnect();
+
+// 미들웨어 설정
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser()); // 쿠키 파서 추가
+app.use("/uploads", express.static("uploads")); // 정적 파일 제공
 
 // EJS 설정
 app.set("view engine", "ejs");
@@ -23,11 +33,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get("/login", (req, res) => {
+app.get("/login", authMiddleware.redirectIfLoggedIn, (req, res) => {
     res.render("pages/login");
 });
 
-app.get("/signup", (req, res) => {
+app.get("/signup", authMiddleware.redirectIfLoggedIn, (req, res) => {
     res.render("pages/register");
 });
 
@@ -36,52 +46,74 @@ app.use(ejsLayouts);
 app.set("layout", "layout"); // 기본 레이아웃 파일 설정 (layout.ejs)
 
 // 라우트 설정
-app.get("/", (req, res) => {
-    res.render("pages/home", {
-        cssFile: "home",
-    });
-});
+app.get(
+    "/",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/home", {
+            cssFile: "home",
+        });
+    }
+);
 
-app.get("/profile", (req, res) => {
-    res.render("pages/profile", {
-        cssFile: "profile",
-    });
-});
+app.get(
+    "/profile",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/profile", {
+            cssFile: "profile",
+        });
+    }
+);
 
-app.get("/profile/:id", (req, res) => {
-    res.render("pages/profileUser", {
-        cssFile: "profile",
-    });
-});
+app.get(
+    "/profile/:id",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/profileUser", {
+            cssFile: "profile",
+        });
+    }
+);
 
-app.get("/follow", (req, res) => {
-    res.render("pages/follow", {
-        cssFile: "follow",
-    });
-});
+app.get(
+    "/follow",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/follow", {
+            cssFile: "follow",
+        });
+    }
+);
 
-app.get("/post/new", (req, res) => {
-    res.render("pages/newPost", {
-        cssFile: "newPost",
-    });
-});
+app.get(
+    "/post/new",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/newPost", {
+            cssFile: "newPost",
+        });
+    }
+);
 
-app.get("/post/:id", (req, res) => {
-    res.render("pages/postDetail", {
-        cssFile: "postDetail",
-    });
-});
+app.get(
+    "/post/:id",
+    authMiddleware.protect,
+    authMiddleware.redirectIfNotLoggedIn,
+    (req, res) => {
+        res.render("pages/postDetail", {
+            cssFile: "postDetail",
+        });
+    }
+);
 
-// MongoDB 연결 설정
-dbConnect();
-
-// 미들웨어 설정
 app.use(helmet()); // 보안 미들웨어 추가
 app.use(cors()); // CORS 설정 추가
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser()); // 쿠키 파서 추가
-app.use("/uploads", express.static("uploads")); // 정적 파일 제공
 
 // 라우트 설정
 const userRoutes = require("./routes/userRoutes");

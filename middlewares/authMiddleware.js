@@ -46,3 +46,17 @@ exports.protect = async (req, res, next) => {
         res.status(401).json({ status: "fail", message: "인증 오류" });
     }
 };
+
+exports.redirectIfLoggedIn = (req, res, next) => {
+    if (req.user) {
+        return res.redirect("/"); // 홈 페이지로 리디렉션
+    }
+    next();
+};
+
+exports.redirectIfNotLoggedIn = (req, res, next) => {
+    if (!req.user) {
+        return res.redirect("/login"); // 로그인 페이지로 리디렉션
+    }
+    next();
+};
