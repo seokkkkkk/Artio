@@ -37,14 +37,14 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // 이미�
 // 기본 라우트 설정
 app.get("/", (req, res) => {
     if (req.session.user) {
-        return res.redirect("/profile");
+        return res.redirect("/feed");
     }
     res.sendFile(path.join(__dirname, "views/login.html"));
 });
 
 app.get("/login", (req, res) => {
     if (req.session.user) {
-        res.redirect("/profile");
+        res.redirect("/feed");
     }
     res.sendFile(path.join(__dirname, "views/login.html"));
 });

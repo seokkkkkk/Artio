@@ -48,6 +48,27 @@
                 border-radius: 5px;
                 resize: none;
             }
+            .button {
+                padding: 10px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                color: #fff;
+                text-align: center;
+            }
+            .logout-button {
+                background-color: #e11d48;
+            }
+            .logout-button:hover {
+                background-color: #be123c;
+            }
+            .feed-button {
+                background-color: #1d4ed8;
+            }
+            .feed-button:hover {
+                background-color: #155ab6;
+            }
             button {
                 padding: 10px;
                 border: none;
@@ -89,6 +110,18 @@
                     <strong>가입 날짜:</strong>
                     <span id="createdAt">Loading...</span>
                 </p>
+            </div>
+
+            <div class="button-group">
+                <button
+                    class="button feed-button"
+                    onclick="location.href='/feed'"
+                >
+                    Go to Feed
+                </button>
+                <button class="button logout-button" onclick="logout()">
+                    로그아웃
+                </button>
             </div>
 
             <form
@@ -181,6 +214,20 @@
                     alert("게시물 업로드 중 오류가 발생했습니다.");
                 }
             };
+
+            async function logout() {
+                try {
+                    const response = await fetch("/api/logout", {
+                        method: "POST",
+                    });
+                    const data = await response.json();
+                    alert(data.message);
+                    window.location.href = "/login.html";
+                } catch (error) {
+                    console.error("Failed to logout:", error);
+                    alert("로그아웃 중 오류가 발생했습니다.");
+                }
+            }
         </script>
     </body>
 </html>
