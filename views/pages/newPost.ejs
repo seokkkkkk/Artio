@@ -1,6 +1,6 @@
 <form action="">
     <h1 class="title">새 게시물</h1>
-    <div class="image-container">
+    <div class="artworks">
         <div class="image">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -41,11 +41,4 @@
     </div>
 </form>
 
-<script>
-    document.querySelectorAll(".image-container").forEach((artwork) => {
-        artwork.addEventListener("wheel", (event) => {
-            event.preventDefault(); // 기본 스크롤 방지
-            artwork.scrollLeft += event.deltaY; // 수직 스크롤을 수평으로 전환
-        });
-    });
-</script>
+<script src="/script/horizontalScroll.js"></script>
