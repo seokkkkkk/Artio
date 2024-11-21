@@ -1,31 +1,68 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
-            required: true,
+            required: [true, "사용자 이름은 필수 항목입니다."],
+            unique: true,
+            trim: true,
+            minlength: [2, "사용자 이름은 최소 2글자 이상이어야 합니다."],
+        },
+        id: {
+            type: String,
+            required: [true, "아이디는 필수 항목입니다."],
             unique: true,
         },
         password: {
             type: String,
-            required: true,
-            select: false,
+            required: [true, "비밀번호는 필수 항목입니다."],
+            minlength: [8, "비밀번호는 최소 8글자 이상이어야 합니다."],
         },
-        profileImage: { type: String, default: "/uploads/default-profile.png" },
-        bio: { type: String, maxlength: 150, default: "" },
-        followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 팔로워 목록
-        following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 팔로우 목록
-        createdAt: {
-            type: Date,
-            default: Date.now,
+        profileImage: {
+            type: String,
+            default: "/uploads/profile_images/default-profile.png",
         },
-        deletedAt: {
-            type: Date,
-            default: null,
+        bio: {
+            type: String,
+            required: [true, "소개글은 필수 항목입니다."],
+            maxlength: [300, "소개글은 최대 300자까지 가능합니다."],
         },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user",
+        },
+        following: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        followers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     { timestamps: true }
 );
+
+// 비밀번호 해시 처리
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+});
+
+// 비밀번호 검증 메소드
+userSchema.methods.correctPassword = async function (
+    candidatePassword,
+    userPassword
+) {
+    return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 module.exports = mongoose.model("User", userSchema);

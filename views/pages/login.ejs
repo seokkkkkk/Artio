@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Artio</title>
+        <link rel="stylesheet" href="/css/global.css" />
+        <script src="/script/login.js"></script>
+    </head>
+    <body style="overflow: hidden">
+        <div id="container">
+            <div id="header">
+                <a id="logo" href="/">ARTIO</a>
+            </div>
+            <div id="content" style="height: 100dvh">
+                <div id="login">
+                    <h1>로그인</h1>
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <input
+                            type="text"
+                            name="id"
+                            placeholder="아이디"
+                            required
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="비밀번호"
+                            required
+                        />
+                        <button type="submit">로그인</button>
+                    </form>
+                    <a href="/signup">회원가입</a>
+                </div>
+                <div id="slogan">
+                    <p>창작을 잇다, 예술을 펼치다.</p>
+                    <p>ARTIO</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

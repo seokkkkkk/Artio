@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Artio</title>
+        <link rel="stylesheet" href="/css/global.css" />
+        <script src="/script/signup.js"></script>
+    </head>
+    <body style="overflow: hidden">
+        <div id="container">
+            <div id="header">
+                <a id="logo" href="/">ARTIO</a>
+            </div>
+            <div id="content" style="height: 100dvh">
+                <div id="login">
+                    <h1>회원가입</h1>
+                    <form id="signupForm" onsubmit="handleSignup(event)">
+                        <input
+                            type="text"
+                            name="id"
+                            placeholder="아이디"
+                            autocomplete="off"
+                            required
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="비밀번호"
+                            autocomplete="new-password"
+                            required
+                        />
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            placeholder="비밀번호 확인"
+                            autocomplete="new-password"
+                            required
+                        />
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="닉네임"
+                            autocomplete="off"
+                            required
+                        />
+                        <input
+                            type="text"
+                            name="bio"
+                            placeholder="소개글"
+                            autocomplete="off"
+                            required
+                        />
+                        <button type="submit">회원가입</button>
+                    </form>
+                    <a href="/login">로그인</a>
+                </div>
+                <div id="slogan">
+                    <p>창작을 잇다, 예술을 펼치다.</p>
+                    <p>ARTIO</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
