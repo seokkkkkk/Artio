@@ -21,8 +21,8 @@ const sendTokenResponse = (user, statusCode, res) => {
 // 회원가입
 exports.signup = async (req, res) => {
     try {
-        const { username, id, password } = req.body;
-        if (!username || !id || !password) {
+        const { username, id, password, bio } = req.body;
+        if (!username || !id || !password || !bio) {
             return res.status(400).json({
                 status: "fail",
                 message: "필수 항목을 모두 입력하세요.",

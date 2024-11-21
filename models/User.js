@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
         },
         bio: {
             type: String,
+            required: [true, "소개글은 필수 항목입니다."],
             maxlength: [300, "소개글은 최대 300자까지 가능합니다."],
         },
         role: {

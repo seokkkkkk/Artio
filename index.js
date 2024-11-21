@@ -48,6 +48,12 @@ app.get("/profile", (req, res) => {
     });
 });
 
+app.get("/profile/:id", (req, res) => {
+    res.render("pages/profileUser", {
+        cssFile: "profile",
+    });
+});
+
 app.get("/follow", (req, res) => {
     res.render("pages/follow", {
         cssFile: "follow",
