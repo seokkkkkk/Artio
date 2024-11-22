@@ -111,13 +111,12 @@ async function renderUserInfo(user, currentUserId) {
 
     if (user._id === currentUserId) {
         followButton.style.display = "none"; // 본인인 경우 숨김
-        profileLink.href = `/profile`;
     } else {
         checkFollowStatus(user.id, followButton); // 팔로우 상태 확인 후 버튼 업데이트
-        profileLink.href = `/profile/${user._id}`;
     }
 
     // 프로필 페이지 링크 설정
+    profileLink.href = `/profile/${user._id}`;
 }
 
 // 작품 렌더링

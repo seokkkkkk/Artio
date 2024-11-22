@@ -35,6 +35,8 @@
 
 .profile-info {
     padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .profile-info div {
@@ -57,6 +59,7 @@ button {
 }
 
 .feed img {
+    cursor: pointer;
     width: 100%; /* 셀의 너비를 가득 채움 */
     aspect-ratio: 1; /* 정사각형 유지 */
     object-fit: cover; /* 셀을 꽉 채우도록 이미지 조정 */

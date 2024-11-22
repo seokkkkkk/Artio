@@ -4,7 +4,6 @@ const User = require("../models/User");
 // 특정 사용자 조회 (비밀번호 제외)
 exports.getUserById = async (req, res) => {
     try {
-        console.log(req.params.id);
         const user = await User.findById(req.params.id).select("-password");
         if (!user) {
             return res.status(404).json({
