@@ -60,8 +60,9 @@ function updateIndicator() {
 
 // Next 버튼 이벤트
 nextButton.addEventListener("click", () => {
+    const images = sliderTrack.children; // 이미지 리스트
     if (currentIndex >= images.length - 1) {
-        return;
+        return; // 마지막 이미지에서는 이동하지 않음
     }
     currentIndex++;
     updateSlider();
@@ -70,7 +71,7 @@ nextButton.addEventListener("click", () => {
 // Prev 버튼 이벤트
 prevButton.addEventListener("click", () => {
     if (currentIndex <= 0) {
-        return;
+        return; // 첫 번째 이미지에서는 이동하지 않음
     }
     currentIndex--;
     updateSlider();
@@ -140,7 +141,6 @@ function renderArtwork(artwork, currentUserId) {
     ).toLocaleDateString();
 
     // 이미지 슬라이더 렌더링
-    const sliderTrack = document.querySelector(".slider-track");
     sliderTrack.innerHTML = ""; // 기존 이미지 제거
     artwork.imageUrls.forEach((url) => {
         const img = document.createElement("img");
@@ -148,6 +148,11 @@ function renderArtwork(artwork, currentUserId) {
         img.alt = "Artwork Image";
         sliderTrack.appendChild(img);
     });
+
+    // 슬라이더 동작 초기화
+    currentIndex = 0; // 슬라이더 초기 인덱스 설정
+    createDots(); // Dot 생성
+    updateSlider(); // 슬라이더 초기화
 
     // 좋아요 버튼 업데이트
     const likeButton = document.querySelector(".post-header .like");
