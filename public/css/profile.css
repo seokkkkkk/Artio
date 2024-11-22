@@ -71,3 +71,12 @@ button {
     background-color: #f1f1f1;
     outline: 1px solid #f1f1f1;
 }
+
+.empty-feed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 14px;
+    color: #999;
+}

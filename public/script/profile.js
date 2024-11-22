@@ -141,7 +141,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 feedContainer.appendChild(imgElement);
             });
         } else {
-            feedContainer.innerHTML = "";
+            feedContainer.innerHTML = `
+                <div class="empty-feed">
+                    <p>작품이 없습니다.</p>
+                </div>
+            `;
         }
     }
 

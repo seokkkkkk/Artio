@@ -44,132 +44,146 @@ async function renderFeed(posts) {
     feedContainer.innerHTML = ""; // 기존 피드 초기화
     const currentUser = await getCurrentUser(); // 현재 사용자 정보 가져오기
 
-    posts.forEach((post) => {
-        const postElement = document.createElement("div");
-        postElement.className = "post";
+    console.log(posts);
 
-        // 사용자 정보
-        const userInfo = document.createElement("div");
-        userInfo.className = "userInfo";
-
-        const profile = `
-            <div class="profile">
-                <a href="/profile/${post.createdBy._id}">
-                    <img src="${
-                        post.createdBy.profileImage ||
-                        "/uploads/profile_images/default-profile.png"
-                    }" alt="프로필 이미지" />
-                </a>
-                <p>${post.createdBy.username}</p>
+    if (posts.length === 0) {
+        feedContainer.innerHTML = `
+            <div class="empty-feed">
+                <p>팔로우한 사용자의 게시물이 없습니다.</p>
+                <p>다른 사용자를 팔로우하고,</p>
+                <p>다양한 작품을 만나보세요!</p>
             </div>
         `;
+    } else {
+        posts.forEach((post) => {
+            const postElement = document.createElement("div");
+            postElement.className = "post";
 
-        const followButton = `
-            <button class="follow" data-user-id="${post.createdBy._id}">
-                언팔로우
-            </button>
-        `;
+            // 사용자 정보
+            const userInfo = document.createElement("div");
+            userInfo.className = "userInfo";
 
-        userInfo.innerHTML = profile + followButton;
+            const profile = `
+                <div class="profile">
+                    <a href="/profile/${post.createdBy._id}">
+                        <img src="${
+                            post.createdBy.profileImage ||
+                            "/uploads/profile_images/default-profile.png"
+                        }" alt="프로필 이미지" />
+                    </a>
+                    <p>${post.createdBy.username}</p>
+                </div>
+            `;
 
-        // 이미지 슬라이더
-        const sliderImages = post.imageUrls
-            .map(
-                (image) =>
-                    `<img src="${image}" alt="${
-                        post.title || "게시물 이미지"
-                    }" />`
-            )
-            .join("");
-        const slider = `
-            <div class="slider">
-                <div class="slider-track">${sliderImages}</div>
-                <div class="indicator"></div>
-                <button class="prev"></button>
-                <button class="next"></button>
-            </div>
-        `;
+            const followButton = `
+                <button class="follow" data-user-id="${post.createdBy._id}">
+                    언팔로우
+                </button>
+            `;
 
-        // 게시물 본문
-        const postContent = `
-            <div class="post-container">
-                <div class="post-header">
-                    <p class="title">${post.title}</p>
-                    <div class="icon">
-                        <p class="comment">
-                            <a href="/post/${post._id}">
+            userInfo.innerHTML = profile + followButton;
+
+            // 이미지 슬라이더
+            const sliderImages = post.imageUrls
+                .map(
+                    (image) =>
+                        `<img src="${image}" alt="${
+                            post.title || "게시물 이미지"
+                        }" />`
+                )
+                .join("");
+            const slider = `
+                <div class="slider">
+                    <div class="slider-track">${sliderImages}</div>
+                    <div class="indicator"></div>
+                    <button class="prev"></button>
+                    <button class="next"></button>
+                </div>
+            `;
+
+            // 게시물 본문
+            const postContent = `
+                <div class="post-container">
+                    <div class="post-header">
+                        <p class="title">${post.title}</p>
+                        <div class="icon">
+                            <p class="comment">
+                                <a href="/post/${post._id}">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="black"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="lucide lucide-message-circle">
+                                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                                    </svg>
+                                </a>
+                            </p>
+                            <p class="like ${
+                                post.likes.includes(currentUser._id)
+                                    ? "active"
+                                    : ""
+                            }" data-post-id="${post._id}">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"
                                     height="24"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="black"
+                                    stroke="currentColor"
                                     stroke-width="2"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
-                                    class="lucide lucide-message-circle">
-                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                                    class="lucide lucide-heart"
+                                >
+                                    <path
+                                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                                    />
                                 </svg>
-                            </a>
-                        </p>
-                        <p class="like ${
-                            post.likes.includes(currentUser._id) ? "active" : ""
-                        }" data-post-id="${post._id}">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="lucide lucide-heart"
-                            >
-                                <path
-                                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-                                />
-                            </svg>
-                        </p>
+                            </p>
+                        </div>
+                    </div>
+                    <p class="post-content">${post.description}</p>
+                    <div class="post-footer">
+                        <p class="date">${new Date(
+                            post.uploadedAt
+                        ).toLocaleDateString()}</p>
+                        <p class="price">${post.price || "0"}원</p>
                     </div>
                 </div>
-                <p class="post-content">${post.description}</p>
-                <div class="post-footer">
-                    <p class="date">${new Date(
-                        post.uploadedAt
-                    ).toLocaleDateString()}</p>
-                    <p class="price">${post.price || "0"}원</p>
-                </div>
-            </div>
-        `;
+            `;
 
-        // 게시물 구성
-        postElement.innerHTML = `
-            ${userInfo.outerHTML}
-            ${slider}
-            ${postContent}
-        `;
+            // 게시물 구성
+            postElement.innerHTML = `
+                ${userInfo.outerHTML}
+                ${slider}
+                ${postContent}
+            `;
 
-        feedContainer.appendChild(postElement);
+            feedContainer.appendChild(postElement);
 
-        // 슬라이더와 닷 컨트롤 초기화
-        initializeSlider(postElement);
+            // 슬라이더와 닷 컨트롤 초기화
+            initializeSlider(postElement);
 
-        const likeButton = postElement.querySelector(
-            `.like[data-post-id="${post._id}"]`
-        );
-        likeButton.addEventListener("click", async () => {
-            const isLiked = likeButton.classList.contains("active");
-            const success = await toggleLike(post._id, isLiked);
-            if (success) {
-                likeButton.classList.toggle("active");
-            } else {
-                alert("좋아요 요청에 실패했습니다.");
-            }
+            const likeButton = postElement.querySelector(
+                `.like[data-post-id="${post._id}"]`
+            );
+            likeButton.addEventListener("click", async () => {
+                const isLiked = likeButton.classList.contains("active");
+                const success = await toggleLike(post._id, isLiked);
+                if (success) {
+                    likeButton.classList.toggle("active");
+                } else {
+                    alert("좋아요 요청에 실패했습니다.");
+                }
+            });
         });
-    });
+    }
 }
 
 function initializeSlider(postElement) {
