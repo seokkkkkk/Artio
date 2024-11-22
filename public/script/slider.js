@@ -1,39 +1,59 @@
 const sliderTrack = document.querySelector(".slider-track");
 const prevButton = document.querySelector(".prev");
 const nextButton = document.querySelector(".next");
-const dots = document.querySelectorAll(".dot");
+const indicator = document.querySelector(".indicator");
 
 let currentIndex = 0;
+let images = sliderTrack.children; // 이미지 리스트
 
+// Dot 동적 생성
+function createDots() {
+    indicator.innerHTML = ""; // 기존 Dot 제거
+    Array.from(images).forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.classList.add("dot");
+        if (index === currentIndex) {
+            dot.classList.add("active");
+        }
+        dot.addEventListener("click", () => {
+            currentIndex = index;
+            updateSlider();
+        });
+        indicator.appendChild(dot);
+    });
+}
+
+// Slider 업데이트 함수
+function updateSlider() {
+    sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+    updateIndicator();
+}
+
+// Dot 활성화 업데이트
 function updateIndicator() {
+    const dots = document.querySelectorAll(".dot");
     dots.forEach((dot, index) => {
         dot.classList.toggle("active", index === currentIndex);
     });
 }
 
+// Next 버튼 이벤트
 nextButton.addEventListener("click", () => {
-    if (currentIndex >= sliderTrack.children.length - 1) {
+    if (currentIndex >= images.length - 1) {
         return;
     }
     currentIndex++;
-    sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-    updateIndicator();
+    updateSlider();
 });
 
+// Prev 버튼 이벤트
 prevButton.addEventListener("click", () => {
     if (currentIndex <= 0) {
         return;
     }
     currentIndex--;
-    sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-    updateIndicator();
+    updateSlider();
 });
 
-// 점 클릭으로 이미지 이동
-dots.forEach((dot, index) => {
-    dot.addEventListener("click", () => {
-        currentIndex = index;
-        sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-        updateIndicator();
-    });
-});
+// 초기화
+createDots();

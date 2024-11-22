@@ -5,6 +5,8 @@ const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
+router.route("/me").get(authMiddleware.protect, userController.getCurrentUser);
+
 router
     .route("/:id")
     .get(authMiddleware.protect, userController.getUserById)
@@ -13,5 +15,9 @@ router
         upload.single("profileImage"),
         userController.updateUser
     );
+
+router
+    .route("/:userId/following")
+    .get(authMiddleware.protect, userController.isFollowing);
 
 module.exports = router;

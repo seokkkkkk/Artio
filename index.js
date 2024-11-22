@@ -46,71 +46,35 @@ app.use(ejsLayouts);
 app.set("layout", "layout"); // 기본 레이아웃 파일 설정 (layout.ejs)
 
 // 라우트 설정
-app.get(
-    "/",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/home", {
-            cssFile: "home",
-        });
-    }
-);
+app.get("/", authMiddleware.protect, (req, res) => {
+    res.render("pages/home", {
+        cssFile: "home",
+    });
+});
 
-app.get(
-    "/profile",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/profile", {
-            cssFile: "profile",
-        });
-    }
-);
+app.get("/profile/:id", authMiddleware.protect, (req, res) => {
+    res.render("pages/profile", {
+        cssFile: "profile",
+    });
+});
 
-app.get(
-    "/profile/:id",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/profileUser", {
-            cssFile: "profile",
-        });
-    }
-);
+app.get("/follow", authMiddleware.protect, (req, res) => {
+    res.render("pages/follow", {
+        cssFile: "follow",
+    });
+});
 
-app.get(
-    "/follow",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/follow", {
-            cssFile: "follow",
-        });
-    }
-);
+app.get("/post/new", authMiddleware.protect, (req, res) => {
+    res.render("pages/newPost", {
+        cssFile: "newPost",
+    });
+});
 
-app.get(
-    "/post/new",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/newPost", {
-            cssFile: "newPost",
-        });
-    }
-);
-
-app.get(
-    "/post/:id",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/postDetail", {
-            cssFile: "postDetail",
-        });
-    }
-);
+app.get("/post/:id", authMiddleware.protect, (req, res) => {
+    res.render("pages/postDetail", {
+        cssFile: "postDetail",
+    });
+});
 
 app.use(helmet()); // 보안 미들웨어 추가
 app.use(cors()); // CORS 설정 추가
@@ -133,21 +97,6 @@ app.use((err, req, res, next) => {
         status: "fail",
         message: "서버 오류가 발생했습니다.",
     });
-});
-
-app.get("/artworks/:id", async (req, res) => {
-    try {
-        const artwork = await Artwork.findById(req.params.id)
-            .populate("createdBy", "username profileImage")
-            .populate("comments.user", "username profileImage");
-        if (!artwork) {
-            return res.status(404).send("작품을 찾을 수 없습니다.");
-        }
-        res.render("artworkDetail", { artwork });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("서버 오류가 발생했습니다.");
-    }
 });
 
 // 서버 시작

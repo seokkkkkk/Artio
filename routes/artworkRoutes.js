@@ -17,6 +17,10 @@ router.route("/views").get(artworkController.getAllArtworksByViews); // 조회�
 router.route("/last-month").get(artworkController.getArtworksFromLastMonth); // 한 달 이내 작품 조회
 
 router
+    .route("/following")
+    .get(authMiddleware.protect, artworkController.getFollowingArtworks); // 팔로잉 사용자 작품 조회
+
+router
     .route("/:id")
     .get(artworkController.getArtworkById)
     .patch(authMiddleware.protect, artworkController.updateArtwork)
@@ -24,6 +28,7 @@ router
 
 router
     .route("/:id/comment")
+    .get(artworkController.getComments)
     .post(authMiddleware.protect, artworkController.addComment);
 
 router
@@ -33,5 +38,7 @@ router
 router
     .route("/:id/like")
     .post(authMiddleware.protect, artworkController.toggleLike);
+
+router.route("/user/:userId").get(artworkController.getArtworksByUser);
 
 module.exports = router;

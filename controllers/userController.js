@@ -1,9 +1,26 @@
 const bcrypt = require("bcrypt");
+const User = require("../models/User");
 
 // 특정 사용자 조회 (비밀번호 제외)
 exports.getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select("-password");
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "사용자를 찾을 수 없습니다.",
+            });
+        }
+        res.status(200).json({ status: "success", data: user });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+// 로그인한 사용자 조회 (비밀번호 제외)
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
         if (!user) {
             return res.status(404).json({
                 status: "fail",
@@ -47,5 +64,23 @@ exports.updateUser = async (req, res) => {
         res.status(200).json({ status: "success", data: user });
     } catch (error) {
         res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
+exports.isFollowing = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser) {
+            return res.status(404).json({
+                status: "fail",
+                message: "사용자를 찾을 수 없습니다.",
+            });
+        }
+
+        const isFollowing = currentUser.following.includes(userId);
+        res.status(200).json({ status: "success", data: { isFollowing } });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
     }
 };
