@@ -46,71 +46,41 @@ app.use(ejsLayouts);
 app.set("layout", "layout"); // 기본 레이아웃 파일 설정 (layout.ejs)
 
 // 라우트 설정
-app.get(
-    "/",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/home", {
-            cssFile: "home",
-        });
-    }
-);
+app.get("/", authMiddleware.protect, (req, res) => {
+    res.render("pages/home", {
+        cssFile: "home",
+    });
+});
 
-app.get(
-    "/profile",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/profile", {
-            cssFile: "profile",
-        });
-    }
-);
+app.get("/profile", authMiddleware.protect, (req, res) => {
+    res.render("pages/profile", {
+        cssFile: "profile",
+    });
+});
 
-app.get(
-    "/profile/:id",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/profileUser", {
-            cssFile: "profile",
-        });
-    }
-);
+app.get("/profile/:id", authMiddleware.protect, (req, res) => {
+    res.render("pages/profileUser", {
+        cssFile: "profile",
+    });
+});
 
-app.get(
-    "/follow",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/follow", {
-            cssFile: "follow",
-        });
-    }
-);
+app.get("/follow", authMiddleware.protect, (req, res) => {
+    res.render("pages/follow", {
+        cssFile: "follow",
+    });
+});
 
-app.get(
-    "/post/new",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/newPost", {
-            cssFile: "newPost",
-        });
-    }
-);
+app.get("/post/new", authMiddleware.protect, (req, res) => {
+    res.render("pages/newPost", {
+        cssFile: "newPost",
+    });
+});
 
-app.get(
-    "/post/:id",
-    authMiddleware.protect,
-    authMiddleware.redirectIfNotLoggedIn,
-    (req, res) => {
-        res.render("pages/postDetail", {
-            cssFile: "postDetail",
-        });
-    }
-);
+app.get("/post/:id", authMiddleware.protect, (req, res) => {
+    res.render("pages/postDetail", {
+        cssFile: "postDetail",
+    });
+});
 
 app.use(helmet()); // 보안 미들웨어 추가
 app.use(cors()); // CORS 설정 추가
