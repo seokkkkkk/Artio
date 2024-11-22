@@ -1,4 +1,32 @@
 const Artwork = require("../models/Artwork");
+const multer = require("multer");
+const path = require("path");
+const mongoose = require("mongoose");
+
+// Multer 설정
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+
+const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const fileTypes = /jpeg|jpg|png|gif/;
+        const extName = fileTypes.test(
+            path.extname(file.originalname).toLowerCase()
+        );
+        if (extName) {
+            return cb(null, true);
+        } else {
+            cb(new Error("이미지 파일만 업로드 가능합니다."));
+        }
+    },
+}).array("images", 5); // 최대 5개의 파일 업로드 허용
 
 // 모든 작품 조회
 exports.getAllArtworks = async (req, res) => {
@@ -16,14 +44,15 @@ exports.getAllArtworks = async (req, res) => {
 // 특정 작품 조회
 exports.getArtworkById = async (req, res) => {
     try {
-        const artwork = await Artwork.findById(req.params.id).populate(
-            "createdBy",
-            "username profileImage"
-        );
-        if (!artwork)
+        const artwork = await Artwork.findById(req.params.id)
+            .populate("createdBy", "username profileImage")
+            .populate("comments.user", "username profileImage"); // 댓글 작성자 정보 포함
+
+        if (!artwork) {
             return res
                 .status(404)
                 .json({ status: "fail", message: "작품을 찾을 수 없습니다." });
+        }
 
         // 조회수 증가
         await artwork.incrementViews();
@@ -46,13 +75,26 @@ exports.getUserArtworks = async (req, res) => {
 
 // 작품 생성
 exports.createArtwork = async (req, res) => {
-    try {
-        req.body.createdBy = req.user.id; // 사용자가 인증된 경우 사용자 ID 추가
-        const newArtwork = await Artwork.create(req.body);
-        res.status(201).json({ status: "success", data: newArtwork });
-    } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
-    }
+    upload(req, res, async (err) => {
+        if (err) {
+            return res
+                .status(400)
+                .json({ status: "fail", message: err.message });
+        }
+
+        try {
+            const imageUrls = req.files.map(
+                (file) => `/uploads/${file.filename}`
+            );
+            req.body.imageUrls = imageUrls;
+            req.body.createdBy = req.user.id;
+
+            const newArtwork = await Artwork.create(req.body);
+            res.status(201).json({ status: "success", data: newArtwork });
+        } catch (error) {
+            res.status(400).json({ status: "fail", message: error.message });
+        }
+    });
 };
 
 // 작품 수정
@@ -90,6 +132,23 @@ exports.deleteArtwork = async (req, res) => {
                 .status(404)
                 .json({ status: "fail", message: "작품을 찾을 수 없습니다." });
         res.status(204).json({ status: "success", data: null });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+exports.getComments = async (req, res) => {
+    try {
+        const artwork = await Artwork.findById(req.params.id).populate({
+            path: "comments.user",
+            select: "username profileImage",
+        });
+        if (!artwork) {
+            return res
+                .status(404)
+                .json({ status: "fail", message: "작품을 찾을 수 없습니다." });
+        }
+        res.status(200).json({ status: "success", data: artwork.comments });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
     }
@@ -154,13 +213,12 @@ exports.deleteComment = async (req, res) => {
 
 // 좋아요 추가/취소
 exports.toggleLike = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
-        const artwork = await Artwork.findById(req.params.id).session(session);
+        const artwork = await Artwork.findById(req.params.id);
         if (!artwork) {
-            throw new Error("작품을 찾을 수 없습니다.");
+            return res
+                .status(404)
+                .json({ status: "fail", message: "작품을 찾을 수 없습니다." });
         }
 
         const likeIndex = artwork.likes.indexOf(req.user.id);
@@ -172,15 +230,10 @@ exports.toggleLike = async (req, res) => {
             artwork.likes.splice(likeIndex, 1);
         }
 
-        await artwork.save({ session });
-        await session.commitTransaction();
-
+        await artwork.save();
         res.status(200).json({ status: "success", data: artwork });
     } catch (error) {
-        await session.abortTransaction();
         res.status(500).json({ status: "fail", message: error.message });
-    } finally {
-        session.endSession();
     }
 };
 
@@ -232,6 +285,25 @@ exports.getAllArtworksByViews = async (req, res) => {
         const artworks = await Artwork.find()
             .sort({ views: -1 }) // 조회수 기준 내림차순 정렬
             .populate("createdBy", "username profileImage");
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+exports.getArtworksByUser = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const artworks = await Artwork.find({ createdBy: userId }).populate(
+            "createdBy",
+            "username profileImage"
+        );
+        if (!artworks.length) {
+            return res.status(404).json({
+                status: "fail",
+                message: "해당 사용자의 작품이 없습니다.",
+            });
+        }
         res.status(200).json({ status: "success", data: artworks });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });

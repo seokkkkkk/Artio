@@ -9,7 +9,7 @@ const createToken = (id) => {
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
-    const token = createToken(user._id);
+    const token = createToken(user.id);
     res.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -43,7 +43,7 @@ exports.signup = async (req, res) => {
         // 사용자 생성
         const newUser = await User.create({
             username,
-            id,
+            userId: id,
             password,
             bio,
         });
@@ -68,7 +68,7 @@ exports.login = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ id }).select("+password");
+        const user = await User.findOne({ userId: id }).select("+password");
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({

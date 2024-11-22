@@ -24,6 +24,7 @@ router
 
 router
     .route("/:id/comment")
+    .get(artworkController.getComments)
     .post(authMiddleware.protect, artworkController.addComment);
 
 router
@@ -33,5 +34,7 @@ router
 router
     .route("/:id/like")
     .post(authMiddleware.protect, artworkController.toggleLike);
+
+router.route("/user/:userId").get(artworkController.getArtworksByUser);
 
 module.exports = router;

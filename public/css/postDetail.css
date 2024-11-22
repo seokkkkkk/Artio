@@ -111,6 +111,12 @@
     }
 }
 
+.profile a img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
 .follow {
     background-color: black;
     width: 60px;
@@ -149,6 +155,10 @@
 
     .like.active {
         color: red;
+    }
+
+    .like.active svg {
+        fill: red;
     }
 }
 
