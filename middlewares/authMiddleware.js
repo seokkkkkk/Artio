@@ -21,13 +21,7 @@ exports.protect = async (req, res, next) => {
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET);
         } catch (error) {
-            return res.status(401).json({
-                status: "fail",
-                message:
-                    error.name === "TokenExpiredError"
-                        ? "토큰이 만료되었습니다."
-                        : "유효하지 않은 토큰입니다.",
-            });
+            return res.redirect("/login"); // 로그인 페이지로 리디렉션
         }
 
         req.user = await User.findById(decoded.id);

@@ -109,6 +109,11 @@ a {
     }
 }
 
+#header div {
+    display: flex;
+    gap: 16px;
+}
+
 #footer {
     z-index: 10;
     max-width: 480px;

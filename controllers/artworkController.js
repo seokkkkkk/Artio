@@ -309,3 +309,16 @@ exports.getArtworksByUser = async (req, res) => {
         res.status(500).json({ status: "fail", message: error.message });
     }
 };
+
+//내가 팔로우한 사용자들의 작품 조회
+exports.getFollowingArtworks = async (req, res) => {
+    try {
+        const following = req.user.following;
+        const artworks = await Artwork.find({
+            createdBy: { $in: following },
+        }).populate("createdBy", "username profileImage");
+        res.status(200).json({ status: "success", data: artworks });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};

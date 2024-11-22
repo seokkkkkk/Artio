@@ -121,9 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             followButton.addEventListener("click", async () => {
                 const success = await toggleFollow(profileId, isFollowing);
                 if (success) {
-                    followButton.textContent = isFollowing
-                        ? "팔로우"
-                        : "언팔로우";
+                    location.reload(); // 페이지 새로고침
                 }
             });
         }
@@ -143,7 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 feedContainer.appendChild(imgElement);
             });
         } else {
-            feedContainer.innerHTML = "<p>작품이 없습니다.</p>";
+            feedContainer.innerHTML = "";
         }
     }
 

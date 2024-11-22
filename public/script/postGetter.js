@@ -93,7 +93,6 @@ async function fetchArtworkDetails() {
 }
 
 async function renderUserInfo(user, currentUserId) {
-    // 프로필 이미지 업데이트
     const profileLink = document.querySelector(".userInfo .profile a");
     const profileImage = document.createElement("img");
     profileImage.src =
@@ -101,22 +100,29 @@ async function renderUserInfo(user, currentUserId) {
     profileImage.alt = `${user.username}의 프로필 이미지`;
     const followButton = document.querySelector(".follow");
 
-    // 기존 SVG 아이콘을 이미지로 대체
     profileLink.innerHTML = "";
     profileLink.appendChild(profileImage);
 
-    // 사용자명 업데이트
     const usernameElement = document.querySelector(".userInfo .profile p");
     usernameElement.textContent = user.username;
 
-    if (user._id === currentUserId) {
-        followButton.style.display = "none"; // 본인인 경우 숨김
-    } else {
-        checkFollowStatus(user.id, followButton); // 팔로우 상태 확인 후 버튼 업데이트
-    }
-
-    // 프로필 페이지 링크 설정
     profileLink.href = `/profile/${user._id}`;
+
+    if (user._id === currentUserId) {
+        followButton.style.display = "none"; // 본인 프로필에서는 버튼 숨기기
+    } else {
+        let isFollowing = await checkFollowStatus(user._id, followButton);
+
+        followButton.addEventListener("click", async () => {
+            const success = await toggleFollow(user._id, isFollowing);
+            if (success) {
+                isFollowing = !isFollowing; // 상태 업데이트
+                followButton.textContent = isFollowing ? "언팔로우" : "팔로우";
+            } else {
+                alert("팔로우/언팔로우 요청에 실패했습니다.");
+            }
+        });
+    }
 }
 
 // 작품 렌더링
@@ -224,6 +230,51 @@ async function toggleLike() {
         fetchArtworkDetails(); // 작품 상세 정보 갱신
     } catch (error) {
         console.error(error.message);
+    }
+}
+
+// 팔로우 상태 확인
+async function toggleFollow(userId, isFollowing) {
+    try {
+        const url = isFollowing
+            ? `/api/follow/unfollow/${userId}` // 언팔로우 API
+            : `/api/follow/follow/${userId}`; // 팔로우 API
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok)
+            throw new Error("팔로우/언팔로우 요청에 실패했습니다.");
+        return true; // 요청 성공 시
+    } catch (error) {
+        console.error(error.message);
+        return false; // 요청 실패 시
+    }
+}
+
+async function checkFollowStatus(userId, followButton) {
+    try {
+        const response = await fetch(`/api/users/${userId}/following`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) throw new Error("팔로우 상태를 확인할 수 없습니다.");
+
+        const { data } = await response.json();
+
+        // 버튼 텍스트 및 상태 설정
+        followButton.textContent = data.isFollowing ? "언팔로우" : "팔로우";
+        return data.isFollowing;
+    } catch (error) {
+        console.error(error.message);
+        return false;
     }
 }
 
