@@ -80,3 +80,8 @@ button {
     font-size: 14px;
     color: #999;
 }
+
+#right-button {
+    display: flex;
+    gap: 10px;
+}

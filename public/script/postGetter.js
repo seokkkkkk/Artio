@@ -149,6 +149,30 @@ function renderArtwork(artwork, currentUserId) {
         sliderTrack.appendChild(img);
     });
 
+    const deleteButton = document.querySelector(".post-header .delete");
+    if (artwork.createdBy._id === currentUserId) {
+        deleteButton.style.display = "inline-block"; // 본인 게시물일 경우 버튼 표시
+        deleteButton.addEventListener("click", async () => {
+            const confirmDelete = confirm(
+                "정말로 이 게시물을 삭제하시겠습니까?"
+            );
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`${BASE_URL}/${artworkId}`, {
+                        method: "DELETE",
+                    });
+                    if (!response.ok)
+                        throw new Error("게시물 삭제에 실패했습니다.");
+                    alert("게시물이 삭제되었습니다.");
+                    window.location.href = "/"; // 삭제 후 홈으로 이동
+                } catch (error) {
+                    console.error(error.message);
+                    alert("삭제 중 오류가 발생했습니다.");
+                }
+            }
+        });
+    }
+
     // 슬라이더 동작 초기화
     currentIndex = 0; // 슬라이더 초기 인덱스 설정
     createDots(); // Dot 생성

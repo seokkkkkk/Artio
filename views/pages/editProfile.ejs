@@ -1,0 +1,20 @@
+<div class="edit-profile-container">
+    <h1>프로필 수정</h1>
+    <form id="edit-profile-form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="profileImage">프로필 이미지</label>
+            <input
+                type="file"
+                id="profileImage"
+                name="profileImage"
+                accept="image/*"
+            />
+        </div>
+        <div class="form-group">
+            <label for="username">닉네임</label>
+            <input type="text" id="username" name="username" />
+        </div>
+        <button type="submit" class="save-btn">저장</button>
+    </form>
+</div>
+<script src="/script/editProfile.js"></script>

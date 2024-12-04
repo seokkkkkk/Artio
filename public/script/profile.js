@@ -18,6 +18,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // 회원탈퇴 요청
+    async function deleteAccount() {
+        try {
+            const confirmed = confirm("정말로 회원탈퇴를 진행하시겠습니까?");
+            if (!confirmed) return;
+
+            const response = await fetch(`/api/auth/delete`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+            if (response.status === 204) {
+                alert("회원탈퇴가 완료되었습니다.");
+                window.location.href = "/login"; // 홈으로 리디렉션
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || "회원탈퇴에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     // 사용자 정보 가져오기
     async function fetchUserProfile(userId) {
         try {
@@ -109,8 +131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 userProfile.following.length || 0;
         }
 
+        const deleteButton = document.querySelector("#delete-account-btn");
+        if (isOwnProfile) {
+            deleteButton.addEventListener("click", deleteAccount);
+        }
+
         // 자신일 경우 팔로우 버튼 숨기기
-        const followButton = document.querySelector(".profile-info button");
+        const followButton = document.querySelector("#follow-button");
         if (isOwnProfile) {
             followButton.style.display = "none";
         } else {
