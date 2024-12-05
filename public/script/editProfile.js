@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error("프로필 정보를 가져오지 못했습니다.");
             const { data } = await response.json();
             document.getElementById("username").value = data.username;
+            document.getElementById("bio").value = data.bio;
         } catch (error) {
             console.error(error.message);
         }
