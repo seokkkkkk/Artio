@@ -52,9 +52,17 @@ app.get("/", authMiddleware.protect, (req, res) => {
     });
 });
 
+app.get("/profile/edit", authMiddleware.protect, (req, res) => {
+    res.render("pages/editProfile", {
+        cssFile: "editProfile",
+    });
+});
+
 app.get("/profile/:id", authMiddleware.protect, (req, res) => {
     res.render("pages/profile", {
         cssFile: "profile",
+        loggedInUserId: req.user.id,
+        params: req.params,
     });
 });
 
@@ -84,6 +92,7 @@ const userRoutes = require("./routes/userRoutes");
 const artworkRoutes = require("./routes/artworkRoutes");
 const followRoutes = require("./routes/followRoutes");
 const authRoutes = require("./routes/authRoutes");
+const { log } = require("console");
 
 app.use("/api/users", userRoutes);
 app.use("/api/artworks", artworkRoutes);

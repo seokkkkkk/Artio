@@ -33,6 +33,33 @@ exports.getCurrentUser = async (req, res) => {
     }
 };
 
+exports.updateCurrentUser = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const updateData = { ...req.body };
+
+        if (req.file) {
+            updateData.profileImage = `/uploads/profile_images/${req.file.filename}`;
+        }
+
+        const user = await User.findByIdAndUpdate(userId, updateData, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "사용자를 찾을 수 없습니다.",
+            });
+        }
+
+        res.status(200).json({ status: "success", data: user });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
 // 사용자 정보 수정 (프로필 이미지 포함, 권한 검사 추가)
 exports.updateUser = async (req, res) => {
     try {

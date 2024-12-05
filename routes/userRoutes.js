@@ -5,7 +5,14 @@ const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
-router.route("/me").get(authMiddleware.protect, userController.getCurrentUser);
+router
+    .route("/me")
+    .get(authMiddleware.protect, userController.getCurrentUser)
+    .patch(
+        authMiddleware.protect,
+        upload.single("profileImage"),
+        userController.updateCurrentUser
+    );
 
 router
     .route("/:id")
