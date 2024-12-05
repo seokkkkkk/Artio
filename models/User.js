@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: [true, "비밀번호는 필수 항목입니다."],
-            minlength: [8, "비밀번호는 최소 8글자 이상이어야 합니다."],
+            minlength: [4, "비밀번호는 최소 4글자 이상이어야 합니다."],
         },
         profileImage: {
             type: String,
