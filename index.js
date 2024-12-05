@@ -8,6 +8,7 @@ const cors = require("cors");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const authMiddleware = require("./middlewares/authMiddleware");
+var favicon = require("serve-favicon");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ app.use("/uploads", express.static("uploads")); // 정적 파일 제공
 // EJS 설정
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+app.use(favicon(path.join(__dirname, "public", "assets", "favicon.ico")));
 
 // 정적 파일 제공 (CSS 등)
 app.use(express.static(path.join(__dirname, "public")));
@@ -92,7 +95,6 @@ const userRoutes = require("./routes/userRoutes");
 const artworkRoutes = require("./routes/artworkRoutes");
 const followRoutes = require("./routes/followRoutes");
 const authRoutes = require("./routes/authRoutes");
-const { log } = require("console");
 
 app.use("/api/users", userRoutes);
 app.use("/api/artworks", artworkRoutes);
