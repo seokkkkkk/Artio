@@ -131,28 +131,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 userProfile.following.length || 0;
         }
 
-        const deleteButton = document.querySelector("#delete-account-btn");
-        if (isOwnProfile) {
-            deleteButton.addEventListener("click", deleteAccount);
-        }
-
-        // 자신일 경우 팔로우 버튼 숨기기
-        const followButton = document.querySelector("#follow-button");
-        if (isOwnProfile) {
-            followButton.style.display = "none";
-        } else {
-            // 팔로우 버튼 상태 설정
-            const isFollowing = await fetchFollowStatus(profileId);
-            followButton.textContent = isFollowing ? "언팔로우" : "팔로우";
-
-            followButton.addEventListener("click", async () => {
-                const success = await toggleFollow(profileId, isFollowing);
-                if (success) {
-                    location.reload(); // 페이지 새로고침
-                }
-            });
-        }
-
         // 작품 목록 렌더링
         const artworks = await fetchUserArtworks(profileId);
         const feedContainer = document.querySelector(".feed");
@@ -173,6 +151,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <p>작품이 없습니다.</p>
                 </div>
             `;
+        }
+
+        const deleteButton = document.querySelector("#delete-account-btn");
+        if (isOwnProfile) {
+            deleteButton.addEventListener("click", deleteAccount);
+        }
+
+        // 자신일 경우 팔로우 버튼 숨기기
+        const followButton = document.querySelector("#follow-button");
+        if (isOwnProfile) {
+            followButton.style.display = "none";
+        } else {
+            // 팔로우 버튼 상태 설정
+            const isFollowing = await fetchFollowStatus(profileId);
+            followButton.textContent = isFollowing ? "언팔로우" : "팔로우";
+
+            followButton.addEventListener("click", async () => {
+                const success = await toggleFollow(profileId, isFollowing);
+                if (success) {
+                    location.reload(); // 페이지 새로고침
+                }
+            });
         }
     }
 
